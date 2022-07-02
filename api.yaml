@@ -4,7 +4,8 @@ info:
   title: Log analytics API
   description: Log stream analysis API
   contact:
-    email: marko.schilde@legal.one
+    name: Mohsin Ali
+    email: enmohsinali@gmail.com
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
