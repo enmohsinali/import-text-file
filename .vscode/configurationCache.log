@@ -1,0 +1,1 @@
+{"buildTargets":["destroy","enter","enter-as-root","install","run","stop","test"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

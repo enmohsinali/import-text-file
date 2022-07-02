@@ -1,0 +1,9 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/mohsin/Documents/freelancer/be-coding-challenge 2022/be-coding-challenge-main/devbox'
+if [ ! -e ".env.local" ]; then\
+	cp .env .env.local; \
+fi
+docker-compose up -d
+echo "Service is running on http://localhost:9002"
+make: Leaving directory '/home/mohsin/Documents/freelancer/be-coding-challenge 2022/be-coding-challenge-main/devbox'
+ 
