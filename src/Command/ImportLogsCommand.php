@@ -44,20 +44,10 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        // $arg1 = $input->getArgument('arg1');
-
-        // if ($arg1) {
-        //     $io->note(sprintf('You passed an argument: %s', $arg1));
-        // }
-
-        // if ($input->getOption('option1')) {
-        //     // ...
-        // }
-
-        // return Command::FAILURE;
+        
 
         $defaultFile = '%kernel.root_dir%/../src/AppBundle/Data/logs.txt';
-        $pointer= 0;
+        $pointer = 0;
         $fileName = basename($defaultFile);
         //check if file already parse
         $fileParse = $this->getFile($fileName, $defaultFile);
@@ -65,10 +55,10 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
         // return 0;
         if ($fileParse) {
             if ($fileParse->getParseAt()) {
+                $io->warning("This file has been already proceesed at " . $fileParse->getParseAt()->format('d/M/Y:h:i:s O'));
                 $helper = $this->getHelper('question');
                 $question = new ChoiceQuestion(
-                    "This file has been already proceesed at ".$fileParse->getParseAt()->format('d/M/Y:h:i:s O')." \n Woudl you like to import it again.?",
-                    // choices can also be PHP objects that implement __toString() method
+                    "Woudl you like to import it again.?",
                     ['No', 'Yes'],
                     1
                 );
@@ -76,27 +66,30 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
 
                 $askProcess = $helper->ask($input, $output, $question);
                 // return 0;
-                if($askProcess=='No'){
+                if ($askProcess == 'No') {
                     return Command::SUCCESS;
                 }
-            }else if($fileParse->getPointer() != 0){
+            } else if ($fileParse->getPointer() != 0) {
                 $helper = $this->getHelper('question');
+                $choices = ['Import from start', 'Import from where it was intrupted', 'Do not import'];
                 $question = new ChoiceQuestion(
-                    'This file was intrupted at the line number.  '.$fileParse->getPointer(),
+                    'This file was intrupted at the line number.  ' . $fileParse->getPointer(),
                     // choices can also be PHP objects that implement __toString() method
-                    ['Import from start', 'Import from where it was intrupted', 'Do not import'],
+                    $choices,
                     1
                 );
                 $question->setErrorMessage('Choice %s is invalid.');
 
                 $askImport = $helper->ask($input, $output, $question);
-                $io->writeln("You choose ".$askImport);
-                if($askImport === 2){
+                $askImport = array_search($askImport, $choices);
+                // $io->writeln("You choose ".$askImport);
+                // return 0;
+                if ($askImport === 2) {
                     $io->warning("File $fileName will not process.");
                     return Command::SUCCESS;
-                }else if($askImport === 0){
+                } else if ($askImport === 0) {
                     $pointer = 0;
-                }else{
+                } else {
                     $pointer = $fileParse->getPointer();
                 }
             }
@@ -106,14 +99,14 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
         $logFilePath = $defaultFile;
         $pattern = '/^(\S+) \S+ \S+ \[([^\]]+)\] "([A-Z]+) ([^ "]+)? HTTP\/[0-9.]+" ([0-9]{3})/';
         $logFile = new SplFileObject($logFilePath);
-        while(!$logFile->eof()){
+        while (!$logFile->eof()) {
             $logFile->seek($pointer);
             $contents = $logFile->current();
-            if(!$contents){
-                $io->writeln($fileName.' has been proceed.');
+            if (!$contents) {
+                $io->writeln($fileName . ' has been proceed.');
                 break;
             }
-            $io->writeln($contents);
+            // $io->writeln($contents);
             if (preg_match($pattern, $contents, $matches)) {
                 list($whole_match, $service, $date, $method, $url, $status) = $matches;
                 $date = DateTime::createFromFormat("d/M/Y:h:i:s O", $date);
@@ -126,15 +119,14 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
                 // echo `$service $method $status`;
             } else {
                 // complain if the line didn't match the pattern
-                $io->error("Can't parse line ".$pointer." : ".$contents);
+                $io->error("Can't parse line " . $pointer . " : " . $contents);
             }
             $this->updateFilePointer($fileName, $defaultFile, $pointer);
             $pointer++;
-
         }
         $this->fileCompleted($fileName,$defaultFile);
-        $io->success('File '.$fileName.' has been proccesed.');
-        
+        $io->success('File ' . $fileName . ' has been proccesed.');
+
         return Command::SUCCESS;
     }
 
@@ -160,12 +152,13 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
         return $file->getPointer();
     }
 
-    function fileCompleted($fileName, $filePath){
+    function fileCompleted($fileName, $filePath)
+    {
         $file = $this->getFile($fileName, $filePath);
         $file->setParseAt(new \DateTime('NOW'));
         $this->entityManager->persist($file);
         $this->entityManager->flush();
-   }
+    }
     function getFile($fileName, $filePath)
     {
         $file = $this->entityManager->getRepository(LogParser::class)->findOneBy(['fileName' => $fileName, 'filePath' => $filePath]);
@@ -175,7 +168,7 @@ class ImportLogsCommand extends Command implements SignalableCommandInterface
     function updateFilePointer($fileName, $filePath, $pointer)
     {
         $file = $this->getFile($fileName, $filePath);
-        if(!$file){
+        if (!$file) {
             $file = $this->createNewFileEntry($fileName, $filePath);
         }
 

@@ -65,7 +65,7 @@ class LogParser
         return $this->parse_at;
     }
 
-    public function setParseAt(\DateTimeInterface $parse_at): self
+    public function setParseAt(?\DateTimeInterface $parse_at): self
     {
         $this->parse_at = $parse_at;
 
