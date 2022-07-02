@@ -82,3 +82,7 @@ Parameters as follows
 
 **Example:** 
 http://localhost:9002/count?serviceNames[]=USER-SERVICE&serviceNames[]=INVOICE-SERVICE&startDate=2020-12-26%2017:19:04&endDate=2022-12-26%2017:19:04&statusCode=201
+
+
+### Note
+Currently the system doesn't validate the request data so please always send correct parameters to get the correct result.
