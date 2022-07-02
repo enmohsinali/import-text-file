@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Log;
+use App\Entity\LogParser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,8 +16,9 @@ class LogAnalyzerController extends AbstractController
     {
         // $doctrine = $this->getDoctrine()->getManager();
         $logs = $doctrine->getRepository(Log::class)->findAll();
+        $LogParser = $doctrine->getRepository(LogParser::class)->findOneBy(['id'=>1]);
         // $entityAsArray = $this->serializer->normalize($logs, null);
-        var_dump($logs);
-        return $this->json($logs);
+        var_dump($LogParser);
+        return $this->json($LogParser);
     }
 }

@@ -14,19 +14,22 @@ class LogParser
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $FileName;
+    private $fileName;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $FilePath;
+    private $filePath;
 
-    #[ORM\Column(type: 'datetime')]
-    private $parse_At;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $parse_at;
 
     #[ORM\Column(type: 'integer')]
     private $pointer;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $message;
+
+    #[ORM\Column(type: 'datetime')]
+    private $created_at;
 
     public function getId(): ?int
     {
@@ -35,36 +38,36 @@ class LogParser
 
     public function getFileName(): ?string
     {
-        return $this->FileName;
+        return $this->fileName;
     }
 
-    public function setFileName(string $FileName): self
+    public function setFileName(string $fileName): self
     {
-        $this->FileName = $FileName;
+        $this->fileName = $fileName;
 
         return $this;
     }
 
     public function getFilePath(): ?string
     {
-        return $this->FilePath;
+        return $this->filePath;
     }
 
-    public function setFilePath(string $FilePath): self
+    public function setFilePath(string $filePath): self
     {
-        $this->FilePath = $FilePath;
+        $this->filePath = $filePath;
 
         return $this;
     }
 
     public function getParseAt(): ?\DateTimeInterface
     {
-        return $this->parse_At;
+        return $this->parse_at;
     }
 
-    public function setParseAt(\DateTimeInterface $parse_At): self
+    public function setParseAt(\DateTimeInterface $parse_at): self
     {
-        $this->parse_At = $parse_At;
+        $this->parse_at = $parse_at;
 
         return $this;
     }
@@ -89,6 +92,18 @@ class LogParser
     public function setMessage(?string $message): self
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
 
         return $this;
     }
