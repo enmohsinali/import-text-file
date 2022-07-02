@@ -39,6 +39,36 @@ class LogRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * $return integer Return count based on parameters
+     */
+    public function queryCount($serviceNames,$startDate = null, $endDate = null, $statusCode = null){
+        $queryBuilder = $this->createQueryBuilder('l')->select('COUNT(l.id)');
+        if($serviceNames){
+            $queryBuilder->where('l.serviceName in (:service_names)')
+            ->setParameter('service_names',$serviceNames);
+        }
+
+        if($startDate && $endDate){
+            $queryBuilder->andWhere("l.date BETWEEN :start AND :end")
+            ->setParameter("start", $startDate)
+            ->setParameter("end", $endDate);
+        }else if($startDate){
+            $queryBuilder->andWhere("l.date > :start")
+            ->setParameter("start", $startDate);
+        }else if($endDate){
+            $queryBuilder->andWhere("l.date < :end")
+            ->setParameter("end", $endDate);
+        }
+
+        if($statusCode){
+            $queryBuilder->andWhere("l.statusCode = :code")
+            ->setParameter("code", $statusCode);
+        }
+
+        $count = $queryBuilder->getQuery()->getSingleScalarResult();
+        return $count;        
+    }
 //    /**
 //     * @return Log[] Returns an array of Log objects
 //     */

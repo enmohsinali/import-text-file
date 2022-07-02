@@ -8,21 +8,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Request;
 
 class LogAnalyzerController extends AbstractController
 {
     #[Route('/count', name: 'app_log_analyzer', methods: ['GET'])]
-    public function index(ManagerRegistry $doctrine): JsonResponse
+    public function index(Request $request,ManagerRegistry $doctrine): JsonResponse
     {
-        $em = $doctrine->getManager();
-        $logs = $doctrine->getRepository(Log::class)->findAll();
-        $LogParser = $doctrine->getRepository(LogParser::class)->findOneBy(['id'=>1]);
-        // $entityAsArray = $this->serializer->normalize($logs, null);
-        $LogParser->setParseAt(null);
-        $em->persist($LogParser);
-        $em->flush();
-        // $doctrine->entity
-        var_dump($LogParser);
-        return $this->json($LogParser);
+        $serviceNames = $request->query->get('serviceNames');
+        
+        $startDate = $request->query->get('startDate');
+        $endDate = $request->query->get('endDate');
+        $statusCode = $request->query->get('statusCode');
+
+        $logsCount = $doctrine->getRepository(Log::class)->queryCount($serviceNames,$startDate,$endDate,$statusCode);
+        
+        return $this->json(["counter" => $logsCount]);
     }
 }
